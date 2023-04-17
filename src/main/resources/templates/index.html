@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Главная страница</title>
+    <link th:href="@{css/index.css}" type="text/css" rel="stylesheet">
+</head>
+<body>
+<h3>Первое приложение с использованием Спринг Сесурити</h3>
+<a href="/logout">Выход из личного кабинета</a>
+<form method="post" action="/logout">
+<button type="submit">Выход из личного кабинета</button>
+</form>
+<!--<script th:inline="javascript">-->
+<!--    var username = [[${user.getId}]];-->
+<!--</script>-->
+</body>
+</html>
