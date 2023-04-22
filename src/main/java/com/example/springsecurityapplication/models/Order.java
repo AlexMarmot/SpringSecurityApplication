@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,13 +29,12 @@ public class Order {
         dateTime = LocalDateTime.now();
     }
 
-    public Order(String number, Product product, Person person, int count, float price, LocalDateTime dateTime, Status status) {
+    public Order(String number, Product product, Person person, int count, float price, Status status) {
         this.number = number;
         this.product = product;
         this.person = person;
         this.count = count;
         this.price = price;
-        this.dateTime = dateTime;
         this.status = status;
     }
 

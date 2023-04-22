@@ -1,9 +1,12 @@
 package com.example.springsecurityapplication.controllers;
 
+import com.example.springsecurityapplication.enumm.Status;
 import com.example.springsecurityapplication.models.Cart;
+import com.example.springsecurityapplication.models.Order;
 import com.example.springsecurityapplication.models.Person;
 import com.example.springsecurityapplication.models.Product;
 import com.example.springsecurityapplication.repositories.CartRepository;
+import com.example.springsecurityapplication.repositories.OrderRepository;
 import com.example.springsecurityapplication.repositories.ProductRepository;
 import com.example.springsecurityapplication.security.PersonDetails;
 import com.example.springsecurityapplication.services.PersonService;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 public class MainController {
@@ -31,12 +35,15 @@ public class MainController {
 
     private final CartRepository cartRepository;
 
-    public MainController(ProductRepository productRepository, PersonValidator personValidator, PersonService personService, ProductService productService, CartRepository cartRepository) {
+    private final OrderRepository orderRepository;
+
+    public MainController(ProductRepository productRepository, PersonValidator personValidator, PersonService personService, ProductService productService, CartRepository cartRepository, OrderRepository orderRepository) {
         this.productRepository = productRepository;
         this.personValidator = personValidator;
         this.personService = personService;
         this.productService = productService;
         this.cartRepository = cartRepository;
+        this.orderRepository = orderRepository;
     }
 
     @GetMapping("/person_account")
@@ -186,6 +193,48 @@ public class MainController {
         }
         cartRepository.deleteCartByProductId(id);
         return "redirect:/cart";
+    }
+    @GetMapping("/order/create")
+    public String order(){
+        //Извлекаем объект аутентифицированного пользователя
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        //Этот объект аутентификации преобразуем в PersonDetails
+        PersonDetails personDetails = (PersonDetails) authentication.getPrincipal();
+        //Извлекаем id пользователя из объекта
+        int id_person = personDetails.getPerson().getId();
+
+        List<Cart> cartList = cartRepository.findByPersonId(id_person);
+        List<Product> productList = new ArrayList<>();
+        // С помощью цикла получаем товары из корзины по id
+        for (Cart cart: cartList) {
+            productList.add(productService.getProductId(cart.getProductId()));
+        }
+
+        // Вычисление итоговой цены
+        float price = 0;
+        for (Product product: productList) {
+            price += product.getPrice();
+        }
+
+        String uuid = UUID.randomUUID().toString();
+        for(Product product : productList){
+            Order newOrder = new Order(uuid, product, personDetails.getPerson(), 1, product.getPrice(), Status.Принят);
+            orderRepository.save(newOrder);
+            cartRepository.deleteCartByProductId(product.getId());
+        }
+        return "redirect:/orders";
+    }
+    @GetMapping("/orders")
+    public String orderUser(Model model){
+        //Извлекаем объект аутентифицированного пользователя
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        //Этот объект аутентификации преобразуем в PersonDetails
+        PersonDetails personDetails = (PersonDetails) authentication.getPrincipal();
+        //Метод позволит получить лист всех заказов по объекту Person (его берем из PersonDetails), таким образом можно получить список всех заказов по конкретному пользователю
+        List<Order> orderList = orderRepository.findByPerson(personDetails.getPerson());
+        model.addAttribute("orders", orderList);
+        return "/user/orders";
+
     }
 
 }

@@ -8,6 +8,8 @@
 <h3>
     Корзина товаров
 </h3>
+<h3 th:text="'Итоговая цена: ' + ${price}"></h3>
+<a href="/order/create">Оформить заказ</a>
 <div th:each="product : ${cart_product}">
     <img th:src="'/img/' + ${product.imageList[0].getFileName()}" width="300px"><br>
     <a th:href="@{/product/info/{id}(id=${product.getId()})}" th:text="${product.getTitle()}"></a><br>
@@ -15,6 +17,5 @@
     <a th:href="@{cart/delete/{id}(id=${product.getId()})}">Удалить из корзины</a>
     <hr>
 </div>
-<h3 th:text="'Итоговая цена: ' + ${price}"></h3>
 </body>
 </html>
