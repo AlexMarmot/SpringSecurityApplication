@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Главная страница</title>
+    <link th:href="@{css/index.css}" type="text/css" rel="stylesheet">
+</head>
+<body>
+<h3>Главная страница магазина/Личный кабинет?</h3>
+<form method="post" action="/logout">
+<button type="submit">Выход из личного кабинета</button>
+</form>
+<h3>Сортировка, поиск, фильтрация</h3>
+<form th:method="POST" th:action="@{/person_account/product/search}">
+    <fieldset>
+        <legend>Выберите параметры поиска:</legend>
+        <label for="search">Поиск по наименованию</label>
+        <input type="text" id="search" name="search">
+        <br>
+        <p>Цена: </p>
+        <label for="ot">От</label>
+        <input type="text" name="ot" id="ot">
+        <label for="do">До</label>
+        <input type="text" name="do" id="do">
+        <br>
+        <div>
+            <p>Сортировка по цене: </p>
+            <input type="radio" id="ascending_price" name="price">
+            <label for="ascending_price">По возрастанию</label>
+            <br>
+            <input type="radio" id="descending_price" name="price">
+            <label for="descending_price">По убыванию</label>
+            <br>
+            <input type="radio" id="without_price" name="price">
+            <label for="without_price">Без сортировки</label>
+            <p>Категория товара: </p>
+            <input type="radio" id="without_contract" name="contract">
+            <label for="without_contract">Все категории</label>
+            <br>
+            <input type="radio" id="furniture" name="contract">
+            <label for="descending_price">Мебель</label>
+            <br>
+            <input type="radio" id="appliances" name="contract">
+            <label for="appliances">Бытовая техника</label>
+            <br>
+            <input type="radio" id="clothes" name="contract">
+            <label for="clothes">Одежда</label>
+            <br>
+            <br>
+            <input type="submit" value="Поиск">
+        </div>
+    </fieldset>
+</form>
+<hr>
+<h3>Доступные товары</h3>
+<div th:each="product : ${products}">
+    <img th:src="'/img/' + ${product.imageList[0].getFileName()}" width="300px"><br>
+    <a th:href="@{/product/info/{id}(id=${product.getId()})}" th:text="${product.getTitle()}"></a><br>
+    <p th:text="'Цена: ' + ${product.getPrice}"></p>
+    <a th:href="@{/cart/add/{id}(id=${product.getId()})}">Добавить в корзину</a>
+    <hr>
+</div>
+</body>
+</html>

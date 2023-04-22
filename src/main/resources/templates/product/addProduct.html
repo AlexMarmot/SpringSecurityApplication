@@ -6,7 +6,7 @@
 </head>
 <body>
 <h3>Добавление товаров</h3>
-<form th:method="POST", th:action="@{admin/product/add}" th:pbject="${product}" enctype="multipart/form-data">
+<form th:method="POST", th:action="@{/admin/product/add}" th:object="${product}" enctype="multipart/form-data">
   <label for="title">Введите наименование товара: </label>
   <input type="text" th:field="*{title}" id="title">
   <div style="color: red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
@@ -26,7 +26,7 @@
     <label for="category">Введите наименование склада, на котором находится товар: </label>
     <select name="category" th:field="*{category}" id="category">
         <div th:each="element : ${category}">
-            <option th:text="${element.getName()}" th:value="${element.getId()}"></option>
+            <option th:text="${element.getName()}" th:value="${element.getId()}">
         </div>
     </select>
     <div style="color: red" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
@@ -39,7 +39,7 @@
     <input type="file" name="file_two">
     <input type="file" name="file_three">
     <input type="file" name="file_four">
-    <input type="file" name="file_file">
+    <input type="file" name="file_five">
     <br>
     <p style="color: red">Добавьте до 5 фотографий. Первая фотография будет заглавной</p>
     <input type="submit" value="Добавить">
