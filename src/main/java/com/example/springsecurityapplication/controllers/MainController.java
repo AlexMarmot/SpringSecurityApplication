@@ -1,6 +1,9 @@
 package com.example.springsecurityapplication.controllers;
 
+import com.example.springsecurityapplication.models.Cart;
 import com.example.springsecurityapplication.models.Person;
+import com.example.springsecurityapplication.models.Product;
+import com.example.springsecurityapplication.repositories.CartRepository;
 import com.example.springsecurityapplication.repositories.ProductRepository;
 import com.example.springsecurityapplication.security.PersonDetails;
 import com.example.springsecurityapplication.services.PersonService;
@@ -14,6 +17,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 public class MainController {
     private final ProductRepository productRepository;
@@ -23,11 +29,14 @@ public class MainController {
 
     private final ProductService productService;
 
-    public MainController(ProductRepository productRepository, PersonValidator personValidator, PersonService personService, ProductService productService) {
+    private final CartRepository cartRepository;
+
+    public MainController(ProductRepository productRepository, PersonValidator personValidator, PersonService personService, ProductService productService, CartRepository cartRepository) {
         this.productRepository = productRepository;
         this.personValidator = personValidator;
         this.personService = personService;
         this.productService = productService;
+        this.cartRepository = cartRepository;
     }
 
     @GetMapping("/person_account")
@@ -119,6 +128,64 @@ public class MainController {
         model.addAttribute("value_price_ot", ot);
         model.addAttribute("value_price_do", Do);
         return "/product/product";
+    }
+    @GetMapping("/cart/add/{id}")
+    public String addProductInCart(@PathVariable("id") int id, Model model){
+        //Получаем объект продукта по id
+        Product product = productService.getProductId(id);
+        //Извлекаем объект аутентифицированного пользователя
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        //Этот объект аутентификации преобразуем в PersonDetails
+        PersonDetails personDetails = (PersonDetails) authentication.getPrincipal();
+
+        //Извлекаем id пользователя из объекта
+        int id_person = personDetails.getPerson().getId();
+        Cart cart = new Cart(id_person, product.getId());
+        cartRepository.save(cart);
+        return "redirect:/cart";
+    }
+    @GetMapping("/cart")
+    public String cart(Model model){
+        //Извлекаем объект аутентифицированного пользователя
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        //Этот объект аутентификации преобразуем в PersonDetails
+        PersonDetails personDetails = (PersonDetails) authentication.getPrincipal();
+        //Извлекаем id пользователя из объекта
+        int id_person = personDetails.getPerson().getId();
+
+        List<Cart> cartList = cartRepository.findByPersonId(id_person);
+        List<Product> productList = new ArrayList<>();
+        // С помощью цикла получаем товары из корзины по id
+        for (Cart cart: cartList) {
+            productList.add(productService.getProductId(cart.getProductId()));
+        }
+
+        // Вычисление итоговой цены
+        float price = 0;
+        for (Product product: productList) {
+            price += product.getPrice();
+        }
+
+        model.addAttribute("price", price);
+        model.addAttribute("cart_product", productList);
+        return "/user/cart";
+    }
+    @GetMapping("/cart/delete/{id}")
+    public String deleteProductFromCart(Model model, @PathVariable("id") int id){
+        //Извлекаем объект аутентифицированного пользователя
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        //Этот объект аутентификации преобразуем в PersonDetails
+        PersonDetails personDetails = (PersonDetails) authentication.getPrincipal();
+        //Извлекаем id пользователя из объекта
+        int id_person = personDetails.getPerson().getId();
+        List<Cart> cartList = cartRepository.findByPersonId(id_person);
+        List<Product> productList = new ArrayList<>();
+        // С помощью цикла получаем товары из корзины по id
+        for (Cart cart: cartList) {
+            productList.add(productService.getProductId(cart.getProductId()));
+        }
+        cartRepository.deleteCartByProductId(id);
+        return "redirect:/cart";
     }
 
 }

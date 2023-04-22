@@ -1,4 +1,4 @@
-//Препод показал для примера
+//Преподаватель показал для примера
 
 /*package com.example.springsecurityapplication.security;
 
