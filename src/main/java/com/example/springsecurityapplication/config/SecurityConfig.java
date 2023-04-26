@@ -35,7 +35,7 @@ public class SecurityConfig{
 
                 .requestMatchers("/admin").hasRole("ADMIN") //С помощью этой настройки прописываем, что к "/admin" обращаемся только если роль админа
                 .requestMatchers("/authentication", "/error", "/registration", "/resources/**", "static/**", "css/**", "js/**", "/img/**", "/product", "/product/info/{id}", "/product/search").permitAll() // Указываем, что неаутентифицированные пользователи могут зайти на страницу аутентификации и на объект ошибки
-                // с помощью permitAll укащываем, что неаутентифицированные пользователи могут заходить на перечисленые страницы
+                // с помощью permitAll указываем, что неаутентифицированные пользователи могут заходить на перечисленые страницы
 
                 .anyRequest().hasAnyRole("USER", "ADMIN")
 

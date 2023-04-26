@@ -17,29 +17,33 @@ public class ProductService {
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
-    // Метод для получения списка всех товаров
+
+    // Данный метод позволяет получить список всех товаров
     public List<Product> getAllProduct(){
         return productRepository.findAll();
     }
-    // Метод позволяет получить товар по id
+
+    // Данный метод позволяет получить товар по id
     public Product getProductId(int id){
         Optional<Product> optionalProduct = productRepository.findById(id);
         return optionalProduct.orElse(null);
     }
 
-    //Метод позволяет сохранить товар
+    // Данный метод позволяет сохранить товар
     @Transactional
     public void saveProduct(Product product, Category category){
         product.setCategory(category);
         productRepository.save(product);
     }
-    //Метод позволяет обновить товар
+
+    // Данный метод позволяет обновить данные о товаре
     @Transactional
     public void updateProduct(int id, Product product){
         product.setId(id);
         productRepository.save(product);
     }
-    //Метод позволяет удалить товар по id
+
+    // Данный метод позволяет удалить товар по id
     @Transactional
     public void deleteProduct(int id){
         productRepository.deleteById(id);

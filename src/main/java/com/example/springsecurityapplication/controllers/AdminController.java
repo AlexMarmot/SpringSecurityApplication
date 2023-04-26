@@ -2,12 +2,14 @@ package com.example.springsecurityapplication.controllers;
 
 import com.example.springsecurityapplication.models.Category;
 import com.example.springsecurityapplication.models.Image;
+import com.example.springsecurityapplication.models.Person;
 import com.example.springsecurityapplication.models.Product;
 import com.example.springsecurityapplication.repositories.CategoryRepository;
+import com.example.springsecurityapplication.services.PersonService;
 import com.example.springsecurityapplication.services.ProductService;
-import jakarta.validation.Path;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,14 +24,19 @@ import java.util.UUID;
 public class AdminController {
 
     private final ProductService productService;
+    private final PersonService personService;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${upload.path}")
     String uploadPath;
 
     private final CategoryRepository categoryRepository;
 
-    public AdminController(ProductService productService, CategoryRepository categoryRepository) {
+    public AdminController(ProductService productService, PersonService personService, PasswordEncoder passwordEncoder, CategoryRepository categoryRepository) {
         this.productService = productService;
+        this.personService = personService;
+        this.passwordEncoder = passwordEncoder;
         this.categoryRepository = categoryRepository;
     }
 
@@ -146,14 +153,14 @@ public class AdminController {
         productService.deleteProduct(id);
         return "redirect:/admin";
     }
-    @GetMapping("admin/product/edit/{id}")
+    @GetMapping("/admin/product/edit/{id}")
     public String editProduct (Model model, @PathVariable("id") int id){
         model.addAttribute("product", productService.getProductId(id));
         model.addAttribute("category", categoryRepository.findAll());
         return "product/editProduct";
     }
 
-    @PostMapping("admin/product/edit/{id}")
+    @PostMapping("/admin/product/edit/{id}")
     public String editProduct(Model model, @ModelAttribute("product") @Valid Product product, BindingResult bindingResult, @PathVariable("id") int id){
         if(bindingResult.hasErrors()){
             model.addAttribute("category", categoryRepository.findAll());
@@ -161,6 +168,48 @@ public class AdminController {
         }
         productService.updateProduct(id, product);
         return "redirect:/admin";
+    }
+
+    // Метод возвращает страницу с выводом пользователей и кладет объект пользователя в модель
+    @GetMapping("admin/userSearch")
+    public String person(Model model){;
+        model.addAttribute("person", personService.getAllPerson());
+        return "userChange/userSearch";
+    }
+
+
+    // Метод возвращает страницу информацией о пользователе
+    @GetMapping("admin/userChange/info/{id}")
+    public String infoPerson(@PathVariable("id") int id, Model model){
+        model.addAttribute("person", personService.getPersonById(id));
+        return "userChange/userInfo";
+    }
+
+
+    // Метод возвращает страницу с формой редактирования пользователя и помещает в модель объект редактируемого пользователя по id
+    @GetMapping("admin/userChange/edit/{id}")
+    public String editPerson(@PathVariable("id")int id, Model model){
+        model.addAttribute("userEdit", personService.getPersonById(id));
+        return "userChange/userEdit";
+    }
+
+    // Метод принимает объект с формы и обновляет пользователя
+    @PostMapping("admin/userChange/edit/{id}")
+    public String editPerson(@ModelAttribute("userEdit") @Valid Person person, BindingResult bindingResult, @PathVariable("id") int id){
+        if(bindingResult.hasErrors()){
+            return "userChange/userEdit";
+        }
+        person.setPassword(passwordEncoder.encode(person.getPassword()));
+        personService.updatePerson(id, person);
+        return "redirect:/admin/userSearch";
+    }
+
+
+    // Метод по удалению пользователей
+    @GetMapping("admin/userChange/delete/{id}")
+    public String deletePerson(@PathVariable("id") int id){
+        personService.deletePerson(id);
+        return "redirect:/admin/userSearch";
     }
 
 }

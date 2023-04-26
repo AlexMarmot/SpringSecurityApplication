@@ -1,0 +1,74 @@
+/*ССЫЛКА*/
+
+a {
+    color: #6db77f; /* Цвет обычной ссылки */
+    position: relative;
+    cursor: pointer;
+    text-decoration: none; /* Убирает подчеркивание */
+}
+a:hover{
+    color: #155e28;
+}
+a:after {
+    content: "";
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: -3px;
+    width: 0;
+    height: 2px; /* Высота линии */
+    background-color: black; /* Цвет подчеркивания при исчезании линии*/
+    transition: width 0.5s; /* Время эффекта */
+}
+
+a:hover:after {
+    content: "";
+    width: 100%;
+    display: block;
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 2px; /* Высота линии */
+    background-color: red; /* Цвет подчеркивания при появлении линии*/
+    transition: width 0.5s;  /* Время эффекта */
+}
+
+/*КНОПКА*/
+
+button {
+    text-decoration: none;
+    display: inline-block;
+    padding: 10px 30px;
+    margin: 15px 0;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #80be91;
+    background: #94DDA7;
+    color: #fff !important;
+    font-size: 0.950em;
+    text-transform:  uppercase;
+    transition: .2s ease-in-out;
+}
+button:before {
+    content: "";
+    background: linear-gradient(90deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .5));
+    height: 60px;
+    width: 50px;
+    position: absolute;
+    top: 0px;
+    left: -80px;
+    transform: skewX(-45deg);
+}
+button:hover {
+    background: #6da27a;
+    color: #fff !important;
+}
+button:hover:before {
+    left: 100%;
+    transition: .5s ease-in-out;
+}
+button:focus {
+    background: #598564;
+    color: #fff !important;
+    outline: none;
+}

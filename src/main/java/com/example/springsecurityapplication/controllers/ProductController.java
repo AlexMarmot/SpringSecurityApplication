@@ -27,10 +27,8 @@ public class ProductController {
         model.addAttribute("product", productService.getProductId(id));
         return "/product/infoProduct";
     }
-
-    //
     @PostMapping("/search")
-    public String productSearch(@RequestParam("search") String search, @RequestParam("ot") String ot, @RequestParam("do") String Do, @RequestParam(value = "price", required = false, defaultValue = "") String price, @RequestParam(value = "contract", required = false, defaultValue = "")String contract, Model model){
+    public String productSearch(@RequestParam("search") String search, @RequestParam("ot") String ot, @RequestParam("Do") String Do, @RequestParam(value = "price", required = false, defaultValue = "") String price, @RequestParam(value = "contract", required = false, defaultValue = "")String contract, Model model){
         model.addAttribute("products", productService.getAllProduct());
 
         if(!ot.isEmpty() & !Do.isEmpty()){
@@ -72,5 +70,6 @@ public class ProductController {
         model.addAttribute("value_price_ot", ot);
         model.addAttribute("value_price_do", Do);
         return "/product/product";
+
     }
 }

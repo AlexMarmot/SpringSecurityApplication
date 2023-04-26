@@ -92,13 +92,13 @@ public class MainController {
         return "/user/infoProduct";
     }
 
-    @PostMapping("/person_account/product/search")
-    public String productSearch(@RequestParam("search") String search, @RequestParam("ot") String ot, @RequestParam("do") String Do, @RequestParam(value = "price", required = false, defaultValue = "") String price, @RequestParam(value = "contract", required = false, defaultValue = "")String contract, Model model){
+    @PostMapping("/person account/product/search")
+    public String productSearch(@RequestParam("search") String search, @RequestParam("ot") String ot, @RequestParam("Do") String Do, @RequestParam(value = "price", required = false, defaultValue = "") String price, @RequestParam(value = "contract", required = false, defaultValue = "")String contract, Model model){
         model.addAttribute("products", productService.getAllProduct());
 
         if(!ot.isEmpty() & !Do.isEmpty()){
             if(!price.isEmpty()){
-                if(price.equals("sorted_by_ascending_price")) {
+                if(price.equals("ascending_price")) {
                     if (!contract.isEmpty()) {
                         if (contract.equals("furniture")) {
                             model.addAttribute("search_product", productRepository.findByTitleAndCategoryOrderByPriceAsc(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do), 1));
@@ -110,7 +110,7 @@ public class MainController {
                     } else {
                         model.addAttribute("search_product", productRepository.findByTitleOrderByPriceAsc(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do)));
                     }
-                } else if(price.equals("sorted_by_descending_price")){
+                } else if(price.equals("descending_price")){
                     if(!contract.isEmpty()){
                         System.out.println(contract);
                         if(contract.equals("furniture")){
@@ -135,6 +135,7 @@ public class MainController {
         model.addAttribute("value_price_ot", ot);
         model.addAttribute("value_price_do", Do);
         return "/product/product";
+
     }
     @GetMapping("/cart/add/{id}")
     public String addProductInCart(@PathVariable("id") int id, Model model){
